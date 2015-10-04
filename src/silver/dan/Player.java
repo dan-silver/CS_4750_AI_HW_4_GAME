@@ -7,7 +7,7 @@ abstract public class Player {
     Board.state opponent; // X or O
     Board board;
 
-    public void setBoardAndPlayer(Board board, Board.state player) {
+    public void setBoardAndPlayerName(Board board, Board.state player) {
         this.player = player; // X or O
         this.opponent = this.player == Board.state.X ? Board.state.O : Board.state.X;
         this.board = board;

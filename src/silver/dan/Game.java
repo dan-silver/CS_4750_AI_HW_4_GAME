@@ -31,11 +31,12 @@ public class Game {
     }
 
     // player ONE moves first
+    // creates the board and starts the game
     public static void play (Player playerOne, Player playerTwo) {
         Board board = new Board();
 
-        playerOne.setBoardAndPlayer(board, Board.state.X);
-        playerTwo.setBoardAndPlayer(board, Board.state.O);
+        playerOne.setBoardAndPlayerName(board, Board.state.X);
+        playerTwo.setBoardAndPlayerName(board, Board.state.O);
 
         Game game = new Game(board, playerOne, playerTwo);
         game.play(playerOne);
