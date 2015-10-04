@@ -2,14 +2,7 @@ package silver.dan;
 
 import java.awt.*;
 
-/**
- * Created by dan on 10/3/15.
- */
 public class BeginnerDecision extends Player {
-    BeginnerDecision(Board board, Board.state player) {
-        super(board, player);
-    }
-
     public Point makeMove() {
         // if the player has an open 3-in-a-row
         // return marking the position to get a 4-in-a-row // “Win”
@@ -27,6 +20,8 @@ public class BeginnerDecision extends Player {
         }
 
         //otherwise pick a random empty space
+
+        System.out.println("Picking a random space");
         return board.getRandomOpenSpace();
     }
 
