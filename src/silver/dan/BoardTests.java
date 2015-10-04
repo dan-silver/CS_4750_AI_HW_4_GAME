@@ -1,4 +1,6 @@
-package com.company;
+package silver.dan;
+
+import java.awt.*;
 
 public class BoardTests {
     public static void runTests() {
@@ -17,6 +19,9 @@ public class BoardTests {
         System.out.println("Test 12: " + bt.case12());
         System.out.println("Test 13: " + bt.case13());
         System.out.println("Test 14: " + bt.case14());
+        System.out.println("Test 15: " + bt.case15());
+        System.out.println("Test 16: " + bt.case16());
+        System.out.println("Test 17: " + bt.case17());
     }
 
     public boolean case1() {
@@ -184,6 +189,39 @@ public class BoardTests {
         board.setSpaceStatus(4,1, Board.state.O);
 
         return board.checkGameOver() == Board.state.NONE;
+    }
+
+    public boolean case15() {
+        Board board = new Board();
+
+        board.setSpaceStatus(1, 1, Board.state.X);
+        board.setSpaceStatus(1, 2, Board.state.X);
+        board.setSpaceStatus(1, 3, Board.state.X);
+
+        Point space = board.findOpenNInARow(3, Board.state.X);
+        return (space.x == 1 && space.y == 0) || (space.x == 1 && space.y == 4);
+    }
+
+    public boolean case16() {
+        Board board = new Board();
+
+        board.setSpaceStatus(2, 3, Board.state.X);
+        board.setSpaceStatus(3, 3, Board.state.X);
+        board.setSpaceStatus(4, 3, Board.state.X);
+
+        Point space = board.findOpenNInARow(3, Board.state.X);
+        return (space.x == 1 && space.y == 3);
+    }
+
+    public boolean case17() {
+        Board board = new Board();
+
+        board.setSpaceStatus(2, 2, Board.state.X);
+        board.setSpaceStatus(3, 3, Board.state.X);
+        board.setSpaceStatus(4, 4, Board.state.X);
+
+        Point space = board.findOpenNInARow(3, Board.state.X);
+        return (space.x == 1 && space.y == 1);
     }
 
 

@@ -1,4 +1,4 @@
-package com.company;
+package silver.dan;
 
 import java.awt.*;
 
@@ -16,12 +16,13 @@ public class BeginnerDecision extends Player {
 
         Point threeInARowOpening = board.findOpenNInARow(3, this.player);
         if (threeInARowOpening != null) {
-            System.out.println("win step!");
+            System.out.println("win step for " + this.player);
             return threeInARowOpening; //win condition
         }
 
         Point threeInARowOpeningForEnemy = board.findOpenNInARow(3, this.opponent);
         if (threeInARowOpeningForEnemy != null) {
+            System.out.println("blocking " + this.opponent);
             return threeInARowOpeningForEnemy; //block opponent
         }
 

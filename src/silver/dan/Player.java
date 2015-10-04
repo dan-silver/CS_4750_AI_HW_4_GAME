@@ -1,9 +1,8 @@
-package com.company;
+package silver.dan;
 
-/**
- * Created by dan on 10/3/15.
- */
-public class Player {
+import java.awt.*;
+
+abstract public class Player {
     Board.state player; // X or O
     Board.state opponent; // X or O
     Board board;
@@ -14,4 +13,6 @@ public class Player {
         this.board = board;
 
     }
+
+    abstract public Point makeMove();
 }

@@ -1,4 +1,4 @@
-package com.company;
+package silver.dan;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,6 +11,24 @@ public class Board {
     Board() {
         spaces = new state[5][5];
         setAllSpaces(state.NONE);
+    }
+
+    public void printBoard() {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i < 5; i++) {
+            sb.append("\n | --------------------- | ");
+            sb.append("\n | ");
+            for (int j=0; j<5; j++) {
+
+                if (spaces[i][j] == state.NONE)
+                    sb.append("  |  ");
+                else
+                    sb.append(spaces[i][j]).append(" |  ");
+            }
+        }
+        sb.append("\n | --------------------- | ");
+        System.out.println(sb.toString());
+
     }
 
     public Point getRandomOpenSpace() {
@@ -106,18 +124,19 @@ public class Board {
 
                     for (int x = 0; x < n; x ++) {
                         Board.state currentSpace;
+                        pointsInStreak.add(new Point(position.x, position.y));
                         try {
                             currentSpace = spaces[position.x][position.y];
                         } catch (ArrayIndexOutOfBoundsException e) {
                             continue lookInDirection;
                         }
 
-                        if (currentSpace != player)
+                        if (currentSpace != player) {
                             continue lookInDirection;
+                        }
 
                         position.x += direction.x;
                         position.y += direction.y;
-                        pointsInStreak.add(new Point(position.x, position.y));
                     }
 
                     // check if either end of the streak is open
