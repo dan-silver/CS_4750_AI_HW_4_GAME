@@ -4,20 +4,19 @@ import java.awt.*;
 
 public class Game {
     Player one, two;
-    Board board;
 
-    Game(Board board, Player one, Player two) {
+    Game(Player one, Player two) {
         this.one = one;
         this.two = two;
-        this.board = board;
     }
 
     public void play(Player firstToMove) {
         Player currentPlayer = firstToMove;
+        Board board = new Board();
 
         while (board.checkGameOver() == Board.state.NONE) {
             System.out.println("Current Player: " + currentPlayer.getClass().getSimpleName() + " " + currentPlayer.player);
-            Point move = currentPlayer.makeMove();
+            Point move = currentPlayer.makeMove(board);
             board.setSpaceStatus(move, currentPlayer.player);
 
             board.printBoard();
@@ -33,12 +32,10 @@ public class Game {
     // player ONE moves first
     // creates the board and starts the game
     public static void play (Player playerOne, Player playerTwo) {
-        Board board = new Board();
+        playerOne.setPlayerName(Board.state.X);
+        playerTwo.setPlayerName(Board.state.O);
 
-        playerOne.setBoardAndPlayerName(board, Board.state.X);
-        playerTwo.setBoardAndPlayerName(board, Board.state.O);
-
-        Game game = new Game(board, playerOne, playerTwo);
+        Game game = new Game(playerOne, playerTwo);
         game.play(playerOne);
     }
 }

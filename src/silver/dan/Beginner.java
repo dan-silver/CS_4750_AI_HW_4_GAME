@@ -2,8 +2,9 @@ package silver.dan;
 
 import java.awt.*;
 
-public class BeginnerDecision extends Player {
-    public Point makeMove() {
+public class Beginner extends Player {
+    @Override
+    public Point makeMove(Board board) {
         // if the player has an open 3-in-a-row
         // return marking the position to get a 4-in-a-row // “Win”
 

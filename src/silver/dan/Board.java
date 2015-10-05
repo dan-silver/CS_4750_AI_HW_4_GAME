@@ -2,15 +2,37 @@ package silver.dan;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Board {
     public state spaces[][];
     enum state {NONE, X, O};
 
+    //used in board brute force searches
+    Point directionsToSearch[] = new Point[]{
+            new Point(-1,0), //look up
+            new Point(-1,1), //look diagonal upper right
+            new Point(0, 1), //look right
+            new Point(1, 1), //look diagonal lower right
+            new Point(1, 0), //look down
+            new Point(1, -1), //look diagonal lower left
+            new Point(0, -1), //look left
+            new Point(-1, -1), //look diagonal upper left
+    };
+
+
     Board() {
         spaces = new state[5][5];
         setAllSpaces(state.NONE);
+    }
+
+    public static Board copy(Board source) {
+        Board newBoard = new Board();
+        for (int i=0; i<5; i++) {
+            System.arraycopy(source.spaces[i], 0, newBoard.spaces[i], 0, 5);
+        }
+        return newBoard;
     }
 
     public void printBoard() {
@@ -54,48 +76,104 @@ public class Board {
         spaces[row][col] = status;
     }
 
-    public ArrayList<Point> findNInARow(int n, Board.state player) {
-        //brute force
-        //loop rows, columns and search neighbors looking for a streak
-        for (int i=0; i<5; i++) {
-            for (int j=0; j<5; j++) {
-                Point directionsToSearch[] = new Point[]{
-                        new Point(-1,0), //look up
-                        new Point(-1,1), //look diagonal upper right
-                        new Point(0, 1), //look right
-                        new Point(1, 1), //look diagonal lower right
-                        new Point(1, 0), //look down
-                        new Point(1, -1), //look diagonal lower left
-                        new Point(0, -1), //look left
-                        new Point(-1, -1), //look diagonal upper left
-                };
 
+    public int numberOfSpaceType(state state) {
+        int count = 0;
+        for (int i=0; i<5; i++)
+            for (int j=0; j<5; j++)
+                if (spaces[i][j] == state)
+                    count++;
+        return count;
+    }
+
+    public int numberOfEmptySpaces() {
+        return numberOfSpaceType(state.NONE);
+    }
+
+    public int findNumberOfOpenNInARow(int n, Board.state player) {
+        //brute force
+        int foundCount = 0;
+        //store all found streaks of n markers in an array to prevent duplicates
+        // string format: "START X, START Y, DIRECTION"
+        ArrayList<String> foundStreaks = new ArrayList<>();
+
+        //loop rows, columns and search neighbors looking for a streak
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                Point directionLooking;
                 lookInDirection:
                 for (Point direction : directionsToSearch) {
+                    directionLooking = direction;
                     ArrayList<Point> pointsInStreak = new ArrayList<>();
                     Point position = new Point(i, j);
 
-                    for (int x = 0; x < n; x ++) {
+                    for (int x = 0; x < n; x++) {
                         Board.state currentSpace;
+                        pointsInStreak.add(new Point(position.x, position.y));
                         try {
                             currentSpace = spaces[position.x][position.y];
                         } catch (ArrayIndexOutOfBoundsException e) {
                             continue lookInDirection;
                         }
 
-                        if (currentSpace != player)
+                        if (currentSpace != player) {
                             continue lookInDirection;
+                        }
 
                         position.x += direction.x;
                         position.y += direction.y;
-                        pointsInStreak.add(new Point(position.x, position.y));
                     }
-                    return pointsInStreak;
+
+                    // check if either end of the streak is open
+                    // if so, return it
+
+                    Point startOfStreak = pointsInStreak.get(0);
+                    Point lastPointInStreak = pointsInStreak.get(n-1);
+
+                    Point possibleOpeningBeforeStreak = new Point();
+                    possibleOpeningBeforeStreak.x = startOfStreak.x - directionLooking.x;
+                    possibleOpeningBeforeStreak.y = startOfStreak.y - directionLooking.y;
+
+                    Point spaceAfterStreak = new Point();
+                    spaceAfterStreak.x = lastPointInStreak.x + direction.x;
+                    spaceAfterStreak.y = lastPointInStreak.y + direction.y;
+
+                    boolean validStreak = false;
+                    try {
+                        if (spaces[possibleOpeningBeforeStreak.x][possibleOpeningBeforeStreak.y] == state.NONE)
+                            validStreak = true;
+
+                        // space after streak cannot be of the same type. that would be a duplicate since the larger streak is counted
+
+                        if (spaces[spaceAfterStreak.x][spaceAfterStreak.y] == player)
+                            validStreak = false;
+
+                    } catch (ArrayIndexOutOfBoundsException ignored) {}
+
+                    //check if it's already been found
+                    if (validStreak) {
+                        String uniqueStreakString = startOfStreak.x + "," + startOfStreak.y + "," + pointsInStreak.get(n-1).x + "," + pointsInStreak.get(n-1).y,
+                               uniqueStreakStringReversed = pointsInStreak.get(n-1).x + "," + pointsInStreak.get(n-1).y + "," + startOfStreak.x + "," + startOfStreak.y;
+
+
+                        for (String streak : foundStreaks) {
+                            if (streak.equals(uniqueStreakString)) {
+                                validStreak = false;
+                                break;
+                            }
+                        }
+
+                        if (validStreak) {
+                            foundStreaks.add(uniqueStreakString);
+                            foundStreaks.add(uniqueStreakStringReversed);
+                            foundCount++;
+                        }
+                    }
                 }
             }
-        }
 
-        return null;
+        }
+        return foundCount;
     }
 
 
@@ -104,17 +182,6 @@ public class Board {
         //loop rows, columns and search neighbors looking for a streak
         for (int i=0; i<5; i++) {
             for (int j=0; j<5; j++) {
-                Point directionsToSearch[] = new Point[]{
-                        new Point(-1,0), //look up
-                        new Point(-1,1), //look diagonal upper right
-                        new Point(0, 1), //look right
-                        new Point(1, 1), //look diagonal lower right
-                        new Point(1, 0), //look down
-                        new Point(1, -1), //look diagonal lower left
-                        new Point(0, -1), //look left
-                        new Point(-1, -1), //look diagonal upper left
-                };
-
                 Point directionLooking;
                 lookInDirection:
                 for (Point direction : directionsToSearch) {
@@ -150,8 +217,8 @@ public class Board {
                     possibleOpeningBeforeStreak.y = startOfStreak.y - directionLooking.y;
 
                     Point possibleOpeningAfterStreak = new Point();
-                    possibleOpeningBeforeStreak.x = endOfStreak.x + directionLooking.x;
-                    possibleOpeningBeforeStreak.y = endOfStreak.y + directionLooking.y;
+                    possibleOpeningAfterStreak.x = endOfStreak.x + directionLooking.x;
+                    possibleOpeningAfterStreak.y = endOfStreak.y + directionLooking.y;
 
                     try {
                         if (spaces[possibleOpeningBeforeStreak.x][possibleOpeningBeforeStreak.y] == state.NONE)

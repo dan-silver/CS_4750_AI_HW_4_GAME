@@ -22,6 +22,28 @@ public class BoardTests {
         System.out.println("Test 15: " + bt.case15());
         System.out.println("Test 16: " + bt.case16());
         System.out.println("Test 17: " + bt.case17());
+        System.out.println("Test 18: " + bt.case18());
+        System.out.println("Test 19: " + bt.case19());
+        System.out.println("Test 20: " + bt.case20());
+    }
+
+    private Board getSampleBoard() {
+        Board b = new Board();
+        b.setSpaceStatus(0,4, Board.state.O);
+        b.setSpaceStatus(1,4, Board.state.O);
+        b.setSpaceStatus(1,1, Board.state.O);
+        b.setSpaceStatus(1,2, Board.state.O);
+        b.setSpaceStatus(2,0, Board.state.O);
+        b.setSpaceStatus(2,4, Board.state.O);
+
+        b.setSpaceStatus(1,3, Board.state.X);
+        b.setSpaceStatus(2,1, Board.state.X);
+        b.setSpaceStatus(2,2, Board.state.X);
+        b.setSpaceStatus(2,3, Board.state.X);
+        b.setSpaceStatus(3,2, Board.state.X);
+        b.setSpaceStatus(4,1, Board.state.X);
+
+        return b;
     }
 
     public boolean case1() {
@@ -225,4 +247,15 @@ public class BoardTests {
     }
 
 
+    public boolean case18() {
+        return 4 == getSampleBoard().findNumberOfOpenNInARow(2, Board.state.X);
+    }
+
+    public boolean case19() {
+        return 2 == getSampleBoard().findNumberOfOpenNInARow(2, Board.state.O);
+    }
+
+    public boolean case20() {
+        return 1 == getSampleBoard().findNumberOfOpenNInARow(3, Board.state.O);
+    }
 }
