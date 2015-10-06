@@ -15,6 +15,10 @@ public class Game {
         Board board = new Board();
 
         while (board.checkGameOver() == Board.state.NONE) {
+            //check for tie condition
+            if (board.numberOfEmptySpaces() == 0)
+                return null; //means there was a tie
+
             if (showOutput) System.out.println("Current Player: " + currentPlayer.getClass().getSimpleName() + " " + currentPlayer.player);
             Point move = currentPlayer.makeMove(board);
             board.setSpaceStatus(move, currentPlayer.player);
@@ -49,24 +53,23 @@ public class Game {
     public static void Tournament(Player playerOne, Player playerTwo, int numberOfGames) {
         int playerOneWins = 0,
             playerTwoWins = 0,
+            tieCount = 0,
             numberOfGamesPlayed = 0;
 
         while (numberOfGamesPlayed < numberOfGames) {
-            Player winner;
-            try {
-                winner = Game.play(playerOne, playerTwo, false);
-            } catch (Exception ignored) {
-                continue;
-            }
+            Player winner = Game.play(playerOne, playerTwo, false);
             if (winner == playerOne)
                 playerOneWins++;
             else if (winner == playerTwo)
                 playerTwoWins++;
+            else
+                tieCount++;
 
             numberOfGamesPlayed++;
         }
 
-        System.out.println(playerOne.getClass().getSimpleName() + " wins: " + playerOneWins);
-        System.out.println(playerTwo.getClass().getSimpleName() + " wins: " + playerTwoWins);
+        System.out.println(playerOne.getClass().getSimpleName() + " wins: " + playerOneWins*2 + "%");
+        System.out.println(playerTwo.getClass().getSimpleName() + " wins: " + playerTwoWins*2 + "%");
+        System.out.println("Ties: " + tieCount*2 + "%");
     }
 }

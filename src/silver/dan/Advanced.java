@@ -21,7 +21,7 @@ public class Advanced extends Player {
         }
 
         if (bestNode == null)
-            return treeRoot.successors.get(0).move;
+            return null; //means that there are no possible moves
 
         return bestNode.move;
     }

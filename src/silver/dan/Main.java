@@ -10,6 +10,6 @@ public class Main {
 
         // beginner vs advanced
         // Game.Tournament(new Beginner(), new Advanced(), 100);
-        Game.Tournament(new Beginner(), new Advanced(), 50);
+        Game.Tournament(new Advanced(), new Beginner(), 50);
     }
 }
