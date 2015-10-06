@@ -248,14 +248,14 @@ public class BoardTests {
 
 
     public boolean case18() {
-        return 4 == getSampleBoard().findNumberOfOpenNInARow(2, Board.state.X);
+        return 4 == getSampleBoard().findNumberOfOpenNInARow(2, Board.state.X, true);
     }
 
     public boolean case19() {
-        return 2 == getSampleBoard().findNumberOfOpenNInARow(2, Board.state.O);
+        return 2 == getSampleBoard().findNumberOfOpenNInARow(2, Board.state.O, true);
     }
 
     public boolean case20() {
-        return 1 == getSampleBoard().findNumberOfOpenNInARow(3, Board.state.O);
+        return 1 == getSampleBoard().findNumberOfOpenNInARow(3, Board.state.O, true);
     }
 }

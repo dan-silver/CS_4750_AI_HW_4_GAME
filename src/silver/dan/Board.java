@@ -90,7 +90,7 @@ public class Board {
         return numberOfSpaceType(state.NONE);
     }
 
-    public int findNumberOfOpenNInARow(int n, Board.state player) {
+    public int findNumberOfOpenNInARow(int n, Board.state player, boolean openSpaceAtEitherEnd) {
         //brute force
         int foundCount = 0;
         //store all found streaks of n markers in an array to prevent duplicates
@@ -140,14 +140,17 @@ public class Board {
 
                     boolean validStreak = false;
                     try {
-                        if (spaces[possibleOpeningBeforeStreak.x][possibleOpeningBeforeStreak.y] == state.NONE)
-                            validStreak = true;
+                        if (openSpaceAtEitherEnd)
+                            if (spaces[possibleOpeningBeforeStreak.x][possibleOpeningBeforeStreak.y] == state.NONE)
+                                validStreak = true;
 
                         // space after streak cannot be of the same type. that would be a duplicate since the larger streak is counted
+                        if (openSpaceAtEitherEnd)
+                            if (spaces[spaceAfterStreak.x][spaceAfterStreak.y] == player)
+                                validStreak = false;
 
-                        if (spaces[spaceAfterStreak.x][spaceAfterStreak.y] == player)
-                            validStreak = false;
-
+                        if (!openSpaceAtEitherEnd)
+                            validStreak = true;
                     } catch (ArrayIndexOutOfBoundsException ignored) {}
 
                     //check if it's already been found
@@ -236,90 +239,12 @@ public class Board {
 
     //returns true if the game is over
     public state checkGameOver() {
-
-        //loop streak on rows
-        for (int i=0; i<5; i++) { //loop rows
-            for (int offset = 0; offset < 2; offset++) { //two possible positions in the row for victory
-                state streak = spaces[i][offset];
-                boolean streakFinished = true;
-                for (int j=offset+1; j<4+offset; j++) {
-                    if (spaces[i][j] != streak || streak == state.NONE) {
-                        streakFinished = false;
-                        break;
-                    }
-                }
-                if (streakFinished && streak != state.NONE) {
-                    return streak;
-                }
-            }
-        }
-
-        //check streak on columns
-        for (int i=0; i<5; i++) { //loop columns
-            for (int offset = 0; offset < 2; offset++) { //two possible positions in the row for victory
-                state streak = spaces[offset][i];
-                boolean streakFinished = true;
-                for (int j=offset+1; j<4+offset; j++) {
-                    if (spaces[j][i] != streak || streak == state.NONE) {
-                        streakFinished = false;
-                        break;
-                    }
-                }
-                if (streakFinished && streak != state.NONE) {
-                    return streak;
-                }
-            }
-        }
-
-
-        Point[] startingPoints = new Point[]{
-                new Point(0, 0),
-                new Point(0, 1),
-                new Point(1, 0),
-                new Point(1, 1),
-        };
-
-
-        //check streak on diagonals \
-        for (Point p : startingPoints) {
-            int startRow = p.x;
-            int startCol = p.y;
-            boolean streakFinished = true;
-            state streak = spaces[startRow][startCol];
-            for (int i=0; i<4; i++) {
-                if (spaces[startRow + i][startCol + i] != streak || streak == state.NONE) {
-                    streakFinished = false;
-                    break;
-                }
-            }
-            if (streakFinished) {
-                return streak;
-            }
-        }
-
-        startingPoints = new Point[]{
-                new Point(0, 3),
-                new Point(0, 4),
-                new Point(1, 3),
-                new Point(1, 4),
-        };
-
-        //check streak on diagonals \
-        for (Point p : startingPoints) {
-            int startRow = p.x;
-            int startCol = p.y;
-            boolean streakFinished = true;
-            state streak = spaces[startRow][startCol];
-            for (int i=0; i<4; i++) {
-                if (spaces[startRow + i][startCol - i] != streak || streak == state.NONE) {
-                    streakFinished = false;
-                    break;
-                }
-            }
-            if (streakFinished) {
-                return streak;
-            }
-        }
+        boolean xWin = findNumberOfOpenNInARow(4, state.X, false) > 0;
+        boolean oWin = findNumberOfOpenNInARow(4, state.O, false) > 0;
+        if (xWin)
+            return state.X;
+        else if (oWin)
+            return state.O;
 
         return state.NONE;
     }

@@ -6,9 +6,10 @@ public class Main {
          BoardTests.runTests();
 
         // beginner vs human
-//        Game.play(new Beginner(), new HumanPlayer());
+//         Game.play(new Beginner(), new HumanPlayer());
 
         // beginner vs advanced
-//        Game.play(new Beginner(), new Beginner());
+        // Game.Tournament(new Beginner(), new Advanced(), 100);
+        Game.Tournament(new Beginner(), new Advanced(), 50);
     }
 }
