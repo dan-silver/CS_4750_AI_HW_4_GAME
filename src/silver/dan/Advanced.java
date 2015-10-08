@@ -4,13 +4,28 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Advanced extends Player {
+    int nodesExpanded;
+
+    // given the current board, return a move (coordinates to place a piece)
     @Override
-    public Point makeMove(Board board) {
-        MiniMaxNode treeRoot = createMiniMaxTree(board);
-        return miniMaxDecision(treeRoot);
+    public Point makeMove(Board board, boolean showOutput) {
+        long startTime = System.nanoTime();
+        nodesExpanded = 0;
+
+        MiniMaxNode treeRoot = createMiniMaxTree(board, 2); // 2ply MiniMax game tree
+        Point move = miniMaxDecision(treeRoot);
+
+        if (showOutput) printMoveStats(System.nanoTime() - startTime);
+        return move;
     }
 
-    private Point miniMaxDecision(MiniMaxNode treeRoot) {
+    protected void printMoveStats(long elapsedTime) {
+        System.out.println("Time: " + elapsedTime/1000000 + "ms (" + elapsedTime/1000000/1000 + "s)"); //convert ns to ms
+        System.out.println("Nodes expanded: " + nodesExpanded);
+    }
+
+
+    protected Point miniMaxDecision(MiniMaxNode treeRoot) {
         MiniMaxNode bestNode = null;
         int maxValue = Integer.MIN_VALUE;
         for (MiniMaxNode node : treeRoot.successors) {
@@ -27,6 +42,7 @@ public class Advanced extends Player {
     }
 
     private int maxValue(MiniMaxNode n) {
+        nodesExpanded++;
         if (n.isTerminal())
             return utility(n.board, player, opponent);
 
@@ -40,11 +56,13 @@ public class Advanced extends Player {
                 n.decisionPath = minNode;
             }
         }
-
         return v;
     }
 
+
+
     private int minValue(MiniMaxNode n) {
+        nodesExpanded++;
         if (n.isTerminal())
             return utility(n.board, player, opponent);
 
@@ -60,7 +78,6 @@ public class Advanced extends Player {
         }
 
         return v;
-
     }
 
 
@@ -69,7 +86,7 @@ public class Advanced extends Player {
         public ArrayList<MiniMaxNode> successors = new ArrayList<>();
         Board board;
         Point move;
-        public MiniMaxNode parent;
+        public boolean isTerminal = false;
 
         public boolean isTerminal() {
             return successors.size() == 0;
@@ -78,49 +95,55 @@ public class Advanced extends Player {
 
     // run the heuristic evaluation function on a board
     private static int utility(Board board, Board.state player, Board.state opponent) {
-        return 10 * (board.findNumberOfOpenNInARow(4, player, false) - board.findNumberOfOpenNInARow(4, opponent, false))
-                + 3 * (board.findNumberOfOpenNInARow(3, player, true) - board.findNumberOfOpenNInARow(3, opponent, true))
-                + (board.findNumberOfOpenNInARow(2, player, true) - board.findNumberOfOpenNInARow(2, opponent, true));
+        return 10 * (board.findNSpacesInARow(4, player, false) - board.findNSpacesInARow(4, opponent, false))
+                + 3 * (board.findNSpacesInARow(3, player, true) - board.findNSpacesInARow(3, opponent, true))
+                + (board.findNSpacesInARow(2, player, true) - board.findNSpacesInARow(2, opponent, true));
     }
 
-    public MiniMaxNode createMiniMaxTree(Board board) {
+    public MiniMaxNode createMiniMaxTree(Board board, int numberOfLevels) {
         MiniMaxNode root = new MiniMaxNode();
-        ArrayList<MiniMaxNode> secondLevel = new ArrayList<>();
-//        ArrayList<MiniMaxNode> thirdLevel  = new ArrayList<>();
+        ArrayList<MiniMaxNode> topLevel = new ArrayList<>();
+        topLevel.add(root);
 
-        // for every open space, there is a possible action the player can take
-        Board helperBoard = Board.copy(board);
-        for (int i=0;i<board.numberOfEmptySpaces();i++) {
-            MiniMaxNode n = new MiniMaxNode();
-            root.successors.add(n);
-            n.parent = root;
-            secondLevel.add(n);
+        root.board = Board.copy(board);
 
-            //use the helperBoard to fill in spaces, so none are duplicated
-            Point move = helperBoard.getRandomOpenSpace();
-            helperBoard.setSpaceStatus(move, player);
-            n.board = Board.copy(board);
-            n.board.setSpaceStatus(move, player);
-            n.move = move;
-        }
+        // this is a helper that's re-written to with each new level, and passed to the next level to create new nodes
+        ArrayList<MiniMaxNode> previousLevel = topLevel;
+        for (int i=0; i<numberOfLevels; i++)
+            previousLevel = addLevelToTree(previousLevel, i % 2 == 0 ? player : opponent); // levels alternate types
 
-        for (MiniMaxNode secondLevelNode : secondLevel) {
-            helperBoard = Board.copy(secondLevelNode.board);
-            for (int i=0; i<secondLevelNode.board.numberOfEmptySpaces(); i++) {
-                MiniMaxNode nodeOnThirdLevel = new MiniMaxNode();
-//                thirdLevel.add(nodeOnThirdLevel);
-                nodeOnThirdLevel.parent = secondLevelNode;
-                secondLevelNode.successors.add(nodeOnThirdLevel);
+        return root;
+    }
 
-                //copy the parents board into this node
-                nodeOnThirdLevel.board = Board.copy(secondLevelNode.board);
+    // Adds another layer to the MiniMax tree.  The previous layers nodes and the type of level are pass in as parameters
+    public ArrayList<MiniMaxNode> addLevelToTree(ArrayList<MiniMaxNode> previousLevel, Board.state player) {
+        ArrayList<MiniMaxNode> levelNodes = new ArrayList<>();
+        for (MiniMaxNode previousLevelNode : previousLevel) {
+            if (previousLevelNode.isTerminal) continue; // don't add successors to terminal nodes
+            Board helperBoard = Board.copy(previousLevelNode.board);
+            // for every open space, there is a possible action the player can take
+            for (int i=0; i<previousLevelNode.board.numberOfEmptySpaces(); i++) {
+
+                MiniMaxNode newNode = new MiniMaxNode();
+                previousLevelNode.successors.add(newNode);
 
                 //use the helperBoard to fill in spaces, so none are duplicated
                 Point move = helperBoard.getRandomOpenSpace();
-                helperBoard.setSpaceStatus(move, opponent);
-                nodeOnThirdLevel.board.setSpaceStatus(move, opponent);
+                helperBoard.setSpaceStatus(move, player);
+
+                levelNodes.add(newNode);
+
+                //copy the parents board into this node
+                newNode.board = Board.copy(previousLevelNode.board);
+                newNode.board.setSpaceStatus(move, player);
+                newNode.move = move;
+
+
+                if (newNode.board.checkGameOver() != Board.state.NONE)
+                    newNode.isTerminal = true;
+
             }
         }
-        return root;
+        return levelNodes;
     }
 }

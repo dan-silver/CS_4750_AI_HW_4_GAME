@@ -2,7 +2,6 @@ package silver.dan;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Board {
@@ -62,8 +61,9 @@ public class Board {
         }
     }
 
-    public void setSpaceStatus(Point p, state player) {
+    public Board setSpaceStatus(Point p, state player) {
         this.setSpaceStatus(p.x, p.y, player);
+        return this;
     }
 
     public void setAllSpaces(state state) {
@@ -90,7 +90,7 @@ public class Board {
         return numberOfSpaceType(state.NONE);
     }
 
-    public int findNumberOfOpenNInARow(int n, Board.state player, boolean openSpaceAtEitherEnd) {
+    public int findNSpacesInARow(int n, Board.state player, boolean openSpaceAtEitherEnd) {
         //brute force
         int foundCount = 0;
         //store all found streaks of n markers in an array to prevent duplicates
@@ -239,8 +239,8 @@ public class Board {
 
     //returns true if the game is over
     public state checkGameOver() {
-        boolean xWin = findNumberOfOpenNInARow(4, state.X, false) > 0;
-        boolean oWin = findNumberOfOpenNInARow(4, state.O, false) > 0;
+        boolean xWin = findNSpacesInARow(4, state.X, false) > 0;
+        boolean oWin = findNSpacesInARow(4, state.O, false) > 0;
         if (xWin)
             return state.X;
         else if (oWin)

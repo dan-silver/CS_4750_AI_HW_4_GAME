@@ -14,13 +14,15 @@ public class Game {
         Player currentPlayer = firstToMove;
         Board board = new Board();
 
+        //main game loop
+        // loop until the game is either a win or tie
         while (board.checkGameOver() == Board.state.NONE) {
             //check for tie condition
             if (board.numberOfEmptySpaces() == 0)
                 return null; //means there was a tie
 
             if (showOutput) System.out.println("Current Player: " + currentPlayer.getClass().getSimpleName() + " " + currentPlayer.player);
-            Point move = currentPlayer.makeMove(board);
+            Point move = currentPlayer.makeMove(board, showOutput);
             board.setSpaceStatus(move, currentPlayer.player);
 
             if (showOutput) board.printBoard();
@@ -37,7 +39,7 @@ public class Game {
 
     // player ONE moves first
     // creates the board and starts the game
-    // this is just a
+    // single game between two players and shows the board on each turn
     public static Player play (Player playerOne, Player playerTwo) {
         return Game.play(playerOne, playerTwo, true);
     }
@@ -53,10 +55,9 @@ public class Game {
     public static void Tournament(Player playerOne, Player playerTwo, int numberOfGames) {
         int playerOneWins = 0,
             playerTwoWins = 0,
-            tieCount = 0,
-            numberOfGamesPlayed = 0;
+            tieCount = 0;
 
-        while (numberOfGamesPlayed < numberOfGames) {
+        for (int i=0; i<numberOfGames; i++) {
             Player winner = Game.play(playerOne, playerTwo, false);
             if (winner == playerOne)
                 playerOneWins++;
@@ -65,11 +66,11 @@ public class Game {
             else
                 tieCount++;
 
-            numberOfGamesPlayed++;
+            System.out.print(".");
         }
 
-        System.out.println(playerOne.getClass().getSimpleName() + " wins: " + playerOneWins*2 + "%");
-        System.out.println(playerTwo.getClass().getSimpleName() + " wins: " + playerTwoWins*2 + "%");
-        System.out.println("Ties: " + tieCount*2 + "%");
+        System.out.println(playerOne.getClass().getSimpleName() + " wins: " + Math.round(((float) playerOneWins/numberOfGames)*100) + "%");
+        System.out.println(playerTwo.getClass().getSimpleName() + " wins: " + Math.round(((float)playerTwoWins/numberOfGames)*100) + "%");
+        System.out.println("Ties: " + Math.round(((float) tieCount/numberOfGames)*100) + "%");
     }
 }

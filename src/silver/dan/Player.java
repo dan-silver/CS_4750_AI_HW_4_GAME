@@ -11,5 +11,5 @@ abstract public class Player {
         this.opponent = this.player == Board.state.X ? Board.state.O : Board.state.X;
     }
 
-    abstract public Point makeMove(Board board);
+    abstract public Point makeMove(Board board, boolean showOutput);
 }

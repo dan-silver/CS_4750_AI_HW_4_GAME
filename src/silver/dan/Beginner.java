@@ -3,8 +3,10 @@ package silver.dan;
 import java.awt.*;
 
 public class Beginner extends Player {
+
+    // given the current board, return a move (coordinates to place a piece)
     @Override
-    public Point makeMove(Board board) {
+    public Point makeMove(Board board, boolean showOutput) {
         // if the player has an open 3-in-a-row
         // return marking the position to get a 4-in-a-row // “Win”
 
@@ -19,9 +21,7 @@ public class Beginner extends Player {
         }
 
         //otherwise pick a random empty space
-
         return board.getRandomOpenSpace();
     }
-
-    //returns the first occurrence of an n length streak in any direction
 }
+
